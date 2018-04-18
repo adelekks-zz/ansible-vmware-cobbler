@@ -4,8 +4,8 @@
 # Returns changed = True and a adds ansible_facts from the new VM
 # State will set the power status of a guest upon creation. Use powered_on to create and boot.
 # Options ['state', 'vm_extra_config', 'vm_disk', 'vm_nic', 'vm_hardware', 'esxi'] are required together
-- host: 192.168.5.6
-  gather_facts: false 
+#- host: 192.168.5.6
+#  gather_facts: false 
   connection: local
 - name: Create VM's
   vsphere_guest:
