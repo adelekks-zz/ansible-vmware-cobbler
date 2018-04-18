@@ -1,0 +1,13 @@
+---
+- name: 
+  vsphere_guest:
+     vcenter_hostname: "{{ vcenter_hostname }}"
+     username: "{{ username }}"
+     password: "{{ password }}"
+     guest: newvm001
+     from_template: yes
+     template_src: centos7
+     cluster: sgs-cluster
+     resource_pool: "/Resources"
+     vm_extra_config:
+       folder: VM's

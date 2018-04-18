@@ -1,0 +1,40 @@
+---
+##########################################################################
+####### Please make changes if need be
+##########################################################################
+ansible_user: 'root'
+ansible_pass: 'passw0rd'
+PROFILE: 'CentOS-7-x86_64'
+#PROFILE: 'CentOS-6.9-x86_64'
+vcenter_hostname: 'sango-vcenter.sgs.com'
+username: 'Administrator@sangocloud.com'
+password: 'Sango-006'
+size_gb: '20'
+folder: 'Ansible'
+datastore: 'Datastore02'
+public_network: "VM Network"
+private_network: 'Provisioning'
+osid: 'centos64Guest'
+memory_mb: '2048'
+num_cpus: '2'
+esxi_datacenter: 'SDA'
+esxi_hostname: 'sangovm'
+##########################################################################
+######## Set VM HostName 
+###########################################################################
+serverlist:
+  - david01
+  - david02
+##########################################################################
+######## Set VM IP and Gateway
+###########################################################################
+hostip:
+   eth0:
+     david01: 192.168.5.40
+     david02: 192.168.5.41
+   eth1:
+     david01: 10.0.0.40
+     david02: 10.0.0.41
+
+gateway: 
+   - 192.168.5.1

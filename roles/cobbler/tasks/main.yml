@@ -1,0 +1,41 @@
+---
+- include_vars:
+    file: ./group_vars/vm-fasts.yml 
+
+- set_fact: i=0
+
+- name: Create system template 
+  command: 'cobbler system add --name="{{ item.key }}" --profile={{ PROFILE }} \
+          --ip-address="{{ hostip.eth0[item.key] }}" \
+          --netmask=255.255.255.0 \
+          --mac="{{ item.value.hw_eth0 }}"
+          --gateway="{{ gateway.0 }}" \
+          --interface=eth0 \
+          --static=1 \
+          --hostname="{{ item.key }}.{{ domain_name }}" \
+          --dns-name="{{ item.key }}.{{ domain_name }}" \
+          --netboot-enabled=Y'
+  with_dict: "{{ servers }}"
+
+- name: Add eth1 to cobbler system template
+  command: 'cobbler system edit --name="{{ item.key }}" \
+          --mac="{{ item.value.hw_eth1 }}" \
+          --ip-address="{{ hostip.eth1[item.key] }}" \
+          --netmask=255.255.255.0 \
+          --static=1 \
+          --hostname="{{ item.key }}" \
+          --interface=eth1'
+  with_dict: "{{ servers }}"
+
+- name: Cobbler sync 
+  command: cobbler sync
+
+- name: Power on vm
+  vsphere_guest:
+    vcenter_hostname: "{{ vcenter_hostname  }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    guest: "{{ item.key }}"
+    state: powered_on
+  delegate_to: localhost 
+  with_dict: "{{ servers }}" 

@@ -1,0 +1,12 @@
+#!/usr/bin/env ansible-playbook
+# vim:ft=ansible:
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  serial: 1
+  roles: 
+  - delete-vms
+- hosts: cobbler
+  serial: 1
+  roles:
+     - delete-cobbler

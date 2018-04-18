@@ -1,0 +1,4 @@
+---
+- name: Delete system template
+  command: "cobbler system remove --name={{ item }}"
+  with_items: "{{ serverlist }}"

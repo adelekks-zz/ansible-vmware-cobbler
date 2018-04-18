@@ -1,0 +1,11 @@
+---
+# Remove a vm from vSphere
+# The VM must be powered_off or you need to use force to force a shutdown
+- vsphere_guest:
+    vcenter_hostname: "{{ vcenter_hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    guest: "{{ item }}"
+    state: absent
+    force: yes
+  with_items: "{{ serverlist }}"

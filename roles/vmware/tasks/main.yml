@@ -1,0 +1,79 @@
+---
+# Create a new VM on an ESX server
+# Returns changed = False when the VM already exists
+# Returns changed = True and a adds ansible_facts from the new VM
+# State will set the power status of a guest upon creation. Use powered_on to create and boot.
+# Options ['state', 'vm_extra_config', 'vm_disk', 'vm_nic', 'vm_hardware', 'esxi'] are required together
+- name: Create VM's
+  vsphere_guest:
+    vcenter_hostname: "{{ vcenter_hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    guest: "{{ item }}"
+    state: powered_off
+    vm_extra_config:
+      vcpu.hotadd: yes
+      mem.hotadd:  yes
+      notes: This is a test VM
+      folder: "{{ folder }}"
+    vm_disk:
+      disk1:
+        size_gb: "{{ size_gb }}"
+        type: thin
+        datastore: "{{ datastore }}"
+        # VMs can be put into folders. The value given here is either the full path
+        # to the folder (e.g. production/customerA/lamp) or just the last component
+        # of the path (e.g. lamp):
+        folder: production/customerA/lamp
+    vm_nic:
+      nic1:
+        type: vmxnet3
+        network: "{{ public_network }}"
+        network_type: standard
+      nic2:
+        type: vmxnet3
+        network: "{{ private_network }}"
+        network_type: standard
+    vm_hardware:
+      memory_mb: "{{ memory_mb }}"
+      num_cpus: "{{ num_cpus }}"
+      osid: "{{ osid }}"
+      scsi: paravirtual
+      vm_cdrom:
+        type: "client"
+    esxi:
+      datacenter: "{{ esxi_datacenter }}"
+      hostname: "{{ esxi_hostname }}"
+  with_items: "{{ serverlist }}"
+
+- name: Get vm facts
+  vsphere_guest:
+    vcenter_hostname: "{{ vcenter_hostname }}"
+    username: "{{ username }}"
+    password: "{{ password }}" 
+    guest: "{{ item }}"
+    vmware_guest_facts: yes
+  register: vminfo
+  with_items: "{{ serverlist }}"
+
+- set_fact: servers='[]'
+
+- set_fact:
+     servers: '{{ servers }} + [{ "{{ item.item }}": {"hw_eth0": "{{ item.ansible_facts.hw_eth0.macaddress }}", "hw_eth1": "{{ item.ansible_facts.hw_eth1.macaddress }}"}}]'
+  with_items: "{{ vminfo.results }}"
+
+- set_fact:
+    arr: "{{ arr|default({}) | combine(item) }}"
+  with_items: "{{ servers }}"
+
+- set_fact:
+    servers_json: '{ "servers":{{arr}} }'
+
+- debug: msg="{{servers_json | to_nice_yaml }}"
+
+- name: Create template for Cobbler
+  template: 
+     src: vm-fasts.yml.j2
+     dest: ./group_vars/vm-fasts.yml
+  delegate_to: localhost  
+

@@ -1,0 +1,16 @@
+#!/usr/bin/env ansible-playbook
+# vim:ft=ansible:
+- hosts: localhost
+  connection: local
+  gather_facts: yes
+  serial: 1
+#  become: True
+  roles: 
+  - vmware
+- hosts: cobbler
+#  sudo: True
+#  sudo_user: root
+  gather_facts: yes
+  serial: 1
+  roles:
+     - cobbler
