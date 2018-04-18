@@ -10,7 +10,7 @@
 - hosts: cobbler
 #  sudo: True
 #  sudo_user: root
-  gather_facts: yes
-  serial: 1
-  roles:
-     - cobbler
+#  gather_facts: yes
+#  serial: 1
+#  roles:
+#     - cobbler
